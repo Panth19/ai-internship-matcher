@@ -1,6 +1,5 @@
 # 🇩🇪 German AI Internship Matcher
 
-A semantic AI-powered tool that matches your profile against 20+ real GenAI/AI internship opportunities at top German companies (SAP, Siemens, Bosch, BMW, Zalando, N26, DeepL, BioNTech, etc.) and generates personalized cover letters.
 
 **Built by:** A Master's student in Artificial Intelligence at BTU Cottbus-Senftenberg.
 
@@ -87,17 +86,7 @@ src/
 └── vite-env.d.ts              # Type declarations
 ```
 
-## 🧪 What makes this a strong portfolio piece for German companies
 
-Based on analysis of 2025-2026 internship JDs at SAP, Siemens, Bosch, BMW, Zalando, N26, Deutsche Telekom, Allianz, DeepL, BioNTech, Celonis, Delivery Hero, DFKI, Airbus, Bayer, trivago, Deutsche Bahn, Fraunhofer, Mercedes-Benz, and Personio, **these skills are most requested**:
-
-- ✅ Python, PyTorch/TensorFlow
-- ✅ LLMs, transformers, prompt engineering, RAG
-- ✅ LangChain, Hugging Face
-- ✅ Vector databases & embeddings
-- ✅ Docker, cloud (AWS/Azure/GCP)
-- ✅ MLOps, CI/CD
-- ✅ SQL, data analysis
 
 **This project demonstrates:** LLM/embedding concepts (semantic search via transformers.js), frontend engineering (React/TS), deployment (static hosting), real-world problem solving, and the ability to ship a complete product — exactly what hiring managers want to see.
 
