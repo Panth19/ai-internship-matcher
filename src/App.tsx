@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   Sparkles,
   MapPin,
@@ -22,6 +22,7 @@ import {
 import { internships, type Internship } from "./data/internships";
 import { getEmbedding, cosineSimilarity } from "./services/embeddings";
 import { generateCoverLetter, type UserProfile } from "./services/coverLetter";
+import { fetchAllJobs } from "./services/jobApis";
 
 interface MatchResult {
   internship: Internship;
@@ -46,7 +47,7 @@ export default function App() {
     "Python, PyTorch, TensorFlow, scikit-learn, NLP, Transformers, LangChain, RAG, Hugging Face, SQL, Docker, LLMs, Prompt Engineering, Vector Databases, Computer Vision"
   );
   const [freeTextProfile, setFreeTextProfile] = useState(
-    "Master's student in Artificial Intelligence at BTU Cottbus. Built a RAG chatbot using LangChain and ChromaDB for answering questions from university PDFs. Implemented a sentiment analysis model using BERT for German product reviews. Familiar with deploying ML models on AWS."
+    "Master's student in Artificial Intelligence at BTU Cottbus. Built a RAG chatbot using LangChain and ChromaDB for answering questions from university PDFs. Implemented a sentiment analysis model with PyTorch. Familiar with deploying ML models on AWS and using Docker for containerization."
   );
 
   // Matching state
@@ -58,6 +59,9 @@ export default function App() {
   const [hasMatched, setHasMatched] = useState(false);
   const [coverLetterVariant, setCoverLetterVariant] = useState(0);
   const [copied, setCopied] = useState(false);
+  const [useRealJobs, setUseRealJobs] = useState(false);
+  const [realJobs, setRealJobs] = useState<Internship[]>([]);
+  const [loadingRealJobs, setLoadingRealJobs] = useState(false);
 
   // Parse skills from input
   const parsedSkills = useMemo(
@@ -69,6 +73,23 @@ export default function App() {
     [skillsInput]
   );
 
+  // Load real jobs from APIs
+  useEffect(() => {
+    if (useRealJobs && realJobs.length === 0) {
+      setLoadingRealJobs(true);
+      fetchAllJobs()
+        .then((jobs) => {
+          setRealJobs(jobs);
+        })
+        .catch((err) => {
+          console.error("Failed to load real jobs:", err);
+          alert("Could not load real jobs from APIs. Using curated list instead.");
+          setUseRealJobs(false);
+        })
+        .finally(() => setLoadingRealJobs(false));
+    }
+  }, [useRealJobs]);
+
   // Run matching
   async function runMatch() {
     setIsMatching(true);
@@ -78,6 +99,9 @@ export default function App() {
     setSelectedMatch(null);
 
     try {
+      // Use real jobs or curated list
+      const jobsToMatch = useRealJobs && realJobs.length > 0 ? realJobs : internships;
+
       // Build a composite profile text
       const profileText = [
         `Skills: ${parsedSkills.join(", ")}`,
@@ -94,8 +118,8 @@ export default function App() {
 
       // Get embeddings for all internships and compute similarity
       const results: MatchResult[] = [];
-      for (let i = 0; i < internships.length; i++) {
-        const job = internships[i];
+      for (let i = 0; i < jobsToMatch.length; i++) {
+        const job = jobsToMatch[i];
         const jobText = [
           job.title,
           job.description,
@@ -123,7 +147,7 @@ export default function App() {
           missingSkills: missingSkills.slice(0, 5),
         });
 
-        setModelProgress(50 + ((i + 1) / internships.length) * 50);
+        setModelProgress(50 + ((i + 1) / jobsToMatch.length) * 50);
       }
 
       // Sort by score descending
@@ -202,7 +226,7 @@ export default function App() {
               </div>
             </div>
             <a
-              href="https://github.com"
+              href="https://github.com/Panth19/ai-internship-matcher"
               target="_blank"
               rel="noreferrer"
               className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition"
@@ -226,17 +250,59 @@ export default function App() {
             <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
               GenAI internship
             </span>{" "}
-            in Germany
+            in Germany & Europe
           </h2>
           <p className="text-slate-600 max-w-2xl mx-auto">
-            Enter your skills and let our in-browser AI match you to 20+ real internship
-            opportunities at SAP, Siemens, Bosch, BMW, Zalando and more.
+            Enter your skills and let our in-browser AI match you to real internship
+            opportunities from JustJoinIT, GitHub Jobs, Remotive, and curated roles at SAP, Siemens, Bosch, BMW, and more.
           </p>
         </div>
 
         <div className="grid lg:grid-cols-5 gap-6">
           {/* LEFT COLUMN - Input */}
           <div className="lg:col-span-2 space-y-6">
+            {/* Job Source Toggle */}
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+              <h3 className="font-semibold text-slate-900 mb-4">Job Source</h3>
+              <div className="space-y-2">
+                <label className="flex items-center gap-3 p-3 rounded-lg border-2 border-indigo-200 bg-indigo-50 cursor-pointer">
+                  <input
+                    type="radio"
+                    checked={!useRealJobs}
+                    onChange={() => setUseRealJobs(false)}
+                    className="w-4 h-4"
+                  />
+                  <div>
+                    <div className="font-medium text-slate-900">Curated List</div>
+                    <div className="text-xs text-slate-600">20 hand-picked German companies</div>
+                  </div>
+                </label>
+                <label className="flex items-center gap-3 p-3 rounded-lg border-2 border-slate-200 cursor-pointer hover:border-indigo-200">
+                  <input
+                    type="radio"
+                    checked={useRealJobs}
+                    onChange={() => setUseRealJobs(true)}
+                    className="w-4 h-4"
+                  />
+                  <div>
+                    <div className="font-medium text-slate-900">Real-Time APIs</div>
+                    <div className="text-xs text-slate-600">JustJoinIT, GitHub Jobs, Remotive</div>
+                  </div>
+                </label>
+              </div>
+              {useRealJobs && loadingRealJobs && (
+                <div className="mt-3 p-2 bg-blue-50 border border-blue-200 rounded text-xs text-blue-800">
+                  <Loader2 className="w-3 h-3 inline animate-spin mr-1" />
+                  Loading real jobs...
+                </div>
+              )}
+              {useRealJobs && realJobs.length > 0 && (
+                <div className="mt-3 p-2 bg-emerald-50 border border-emerald-200 rounded text-xs text-emerald-800">
+                  ✓ Loaded {realJobs.length} real internships
+                </div>
+              )}
+            </div>
+
             {/* Profile Card */}
             <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
               <div className="flex items-center gap-2 mb-4">
@@ -359,8 +425,8 @@ export default function App() {
             {/* Match Button */}
             <button
               onClick={runMatch}
-              disabled={isMatching}
-              className="w-full py-3 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl shadow-lg shadow-indigo-200 hover:shadow-xl hover:from-indigo-700 hover:to-purple-700 transition disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              disabled={isMatching || (useRealJobs && loadingRealJobs)}
+              className="w-full py-3 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl shadow-lg shadow-indigo-200 hover:shadow-xl hover:from-indigo-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center gap-2"
             >
               {isMatching ? (
                 <>
@@ -406,8 +472,7 @@ export default function App() {
                 </h3>
                 <p className="text-slate-600 text-sm mb-6 max-w-md mx-auto">
                   Fill in your profile on the left and click "Find My Matches". Our AI
-                  will analyze semantic similarity between your profile and 20+ German
-                  AI internship opportunities.
+                  will analyze semantic similarity between your profile and real internship opportunities.
                 </p>
                 <div className="grid sm:grid-cols-3 gap-3 max-w-2xl mx-auto text-left">
                   <div className="p-3 bg-slate-50 rounded-lg">
@@ -431,10 +496,10 @@ export default function App() {
                   <div className="p-3 bg-slate-50 rounded-lg">
                     <FileText className="w-5 h-5 text-indigo-600 mb-2" />
                     <h4 className="font-medium text-sm text-slate-900">
-                      Cover Letters
+                      Apply Now
                     </h4>
                     <p className="text-xs text-slate-600 mt-1">
-                      Auto-generate personalized cover letters per role
+                      Direct links to real job postings
                     </p>
                   </div>
                 </div>
@@ -507,9 +572,21 @@ export default function App() {
                       </div>
                     </div>
 
-                    <div className="bg-white/10 backdrop-blur rounded-lg p-3 text-sm">
+                    <div className="bg-white/10 backdrop-blur rounded-lg p-3 text-sm mb-4">
                       {selectedMatch.internship.description}
                     </div>
+
+                    {selectedMatch.internship.applicationUrl && (
+                      <a
+                        href={selectedMatch.internship.applicationUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-white text-indigo-600 font-semibold rounded-lg hover:bg-indigo-50 transition"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                        Apply Now
+                      </a>
+                    )}
                   </div>
                 )}
 
@@ -527,45 +604,58 @@ export default function App() {
 
                   <div className="space-y-2 max-h-96 overflow-y-auto pr-2">
                     {matches.map((m, i) => (
-                      <button
-                        key={m.internship.id}
-                        onClick={() => {
-                          setSelectedMatch(m);
-                          setCoverLetterVariant(0);
-                        }}
-                        className={`w-full text-left p-3 rounded-lg border transition ${
-                          selectedMatch?.internship.id === m.internship.id
-                            ? "border-indigo-400 bg-indigo-50"
-                            : "border-slate-200 hover:border-slate-300 hover:bg-slate-50"
-                        }`}
-                      >
-                        <div className="flex items-start gap-3">
-                          <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-xs font-semibold text-slate-600">
-                            #{i + 1}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between gap-2 mb-0.5">
-                              <h4 className="font-medium text-sm text-slate-900 truncate">
-                                {m.internship.title}
-                              </h4>
-                              <span
-                                className={`text-xs font-semibold px-2 py-0.5 rounded-full border flex-shrink-0 ${getScoreColor(m.score)}`}
-                              >
-                                {Math.round(m.score * 100)}%
-                              </span>
+                      <div key={m.internship.id}>
+                        <button
+                          onClick={() => {
+                            setSelectedMatch(m);
+                            setCoverLetterVariant(0);
+                          }}
+                          className={`w-full text-left p-3 rounded-lg border transition ${
+                            selectedMatch?.internship.id === m.internship.id
+                              ? "border-indigo-400 bg-indigo-50"
+                              : "border-slate-200 hover:border-slate-300 hover:bg-slate-50"
+                          }`}
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-xs font-semibold text-slate-600">
+                              #{i + 1}
                             </div>
-                            <div className="text-xs text-slate-500 flex items-center gap-2 flex-wrap">
-                              <span>{m.internship.company}</span>
-                              <span>·</span>
-                              <span>{m.internship.location}</span>
-                              <span className="hidden sm:inline">·</span>
-                              <span className="hidden sm:inline">
-                                {m.matchedSkills.length} skills match
-                              </span>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between gap-2 mb-0.5">
+                                <h4 className="font-medium text-sm text-slate-900 truncate">
+                                  {m.internship.title}
+                                </h4>
+                                <span
+                                  className={`text-xs font-semibold px-2 py-0.5 rounded-full border flex-shrink-0 ${getScoreColor(m.score)}`}
+                                >
+                                  {Math.round(m.score * 100)}%
+                                </span>
+                              </div>
+                              <div className="text-xs text-slate-500 flex items-center gap-2 flex-wrap">
+                                <span>{m.internship.company}</span>
+                                <span>·</span>
+                                <span>{m.internship.location}</span>
+                                <span className="hidden sm:inline">·</span>
+                                <span className="hidden sm:inline">
+                                  {m.matchedSkills.length} skills match
+                                </span>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </button>
+                        </button>
+                        {selectedMatch?.internship.id === m.internship.id &&
+                          m.internship.applicationUrl && (
+                            <a
+                              href={m.internship.applicationUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="mt-2 ml-11 flex items-center gap-1 px-3 py-1.5 text-xs font-medium bg-indigo-600 text-white hover:bg-indigo-700 rounded transition"
+                            >
+                              <ExternalLink className="w-3 h-3" />
+                              Apply Now
+                            </a>
+                          )}
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -689,13 +779,23 @@ export default function App() {
                       <b>Why:</b> Recruiters can test the live link instantly.
                     </p>
                   </div>
+                  <div className="p-3 bg-slate-50 rounded-lg">
+                    <div className="font-semibold text-slate-900 mb-1">
+                      🔗 Real Job APIs
+                    </div>
+                    <p className="text-xs text-slate-600">
+                      JustJoinIT, GitHub Jobs, Remotive. <b>Why:</b> Real, live job
+                      postings with application links. No scraping, fully legal & free.
+                    </p>
+                  </div>
                 </div>
                 <div className="mt-3 p-3 bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 rounded-lg">
                   <p className="text-xs text-indigo-900">
                     <b>💡 Recruiter talking point:</b> "I built an app that runs a
                     transformer model entirely in the browser, uses semantic embeddings
-                    for ranking (same principle as RAG), and solves my own real problem
-                    of finding internships. Here's the live link."
+                    for ranking (same principle as RAG), integrates real job APIs for
+                    live internship data, and solves my own real problem of finding
+                    internships. Here's the live link."
                   </p>
                 </div>
               </div>
@@ -706,8 +806,9 @@ export default function App() {
 
       <footer className="border-t border-slate-200 bg-white mt-12 py-6">
         <div className="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500">
-          Built by an AI Master's student at BTU Cottbus-Senftenberg · Internship data
-          reflects real 2026 job postings · AI runs 100% in your browser
+          Built by an AI Master's student at BTU Cottbus-Senftenberg · Uses real job APIs
+          (JustJoinIT, GitHub Jobs, Remotive) + curated 2026 internship data · AI runs 100% in
+          your browser · All free, forever
         </div>
       </footer>
     </div>
