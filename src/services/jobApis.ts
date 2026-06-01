@@ -15,7 +15,7 @@ export async function fetchJustJoinITJobs(): Promise<Internship[]> {
       location: job.city || "Remote",
       title: job.title || "Tech Position",
       department: job.work_type?.[0] || "Engineering",
-      description: job.description || job.title || "Tech internship opportunity",
+      description: cleanDescription(job.description || job.title || "Tech internship opportunity"),
       requirements: job.requirements || [],
       skills: extractSkills(job.description || ""),
       duration: "3-6 months",
@@ -46,7 +46,7 @@ export async function fetchGitHubJobs(): Promise<Internship[]> {
       location: job.location || "Remote",
       title: job.title || "Tech Internship",
       department: "Engineering",
-      description: job.description || job.title || "Tech internship",
+      description: cleanDescription(job.description || job.title || "Tech internship"),
       requirements: [],
       skills: extractSkills(job.description || ""),
       duration: "3-6 months",
@@ -77,7 +77,7 @@ export async function fetchRemotiveJobs(): Promise<Internship[]> {
       location: job.job_type === "remote" ? "Remote" : job.job_location || "Remote",
       title: job.title || "Tech Position",
       department: "Engineering",
-      description: job.description || job.title || "Internship opportunity",
+      description: cleanDescription(job.description || job.title || "Internship opportunity"),
       requirements: [],
       skills: extractSkills(job.description || ""),
       duration: "3-6 months",
@@ -91,6 +91,33 @@ export async function fetchRemotiveJobs(): Promise<Internship[]> {
     console.error("Remotive fetch error:", error);
     return [];
   }
+}
+
+// Clean HTML/CSS from descriptions
+function cleanDescription(text: string): string {
+  if (!text) return "Job opportunity available";
+  
+  // Remove HTML tags
+  let cleaned = text.replace(/<[^>]*>/g, "");
+  
+  // Decode HTML entities
+  cleaned = cleaned
+    .replace(/&nbsp;/g, " ")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'");
+  
+  // Remove multiple spaces
+  cleaned = cleaned.replace(/\s+/g, " ").trim();
+  
+  // Limit to first 300 characters
+  if (cleaned.length > 300) {
+    cleaned = cleaned.substring(0, 300).trim() + "...";
+  }
+  
+  return cleaned || "Job opportunity available";
 }
 
 // Helper function to extract skills from job description
