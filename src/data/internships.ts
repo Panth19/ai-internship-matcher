@@ -12,6 +12,7 @@ export interface Internship {
   type: string;
   industry: string;
   focus: string;
+  applicationUrl?: string;
 }
 
 export const internships: Internship[] = [
@@ -35,7 +36,8 @@ export const internships: Internship[] = [
     startDate: "Flexible",
     type: "Mandatory Internship",
     industry: "Enterprise Software",
-    focus: "Generative AI"
+    focus: "Generative AI",
+    applicationUrl: "https://careers.sap.com/job/search"
   },
   {
     id: "siemens-ai-002",
@@ -57,7 +59,8 @@ export const internships: Internship[] = [
     startDate: "ASAP",
     type: "Internship",
     industry: "Industrial Technology",
-    focus: "Industrial AI"
+    focus: "Industrial AI",
+    applicationUrl: "https://www.siemens.com/careers"
   },
   {
     id: "bosch-ml-003",
@@ -79,7 +82,8 @@ export const internships: Internship[] = [
     startDate: "Flexible",
     type: "Research Internship",
     industry: "Automotive & Technology",
-    focus: "Autonomous Systems"
+    focus: "Autonomous Systems",
+    applicationUrl: "https://www.bosch.com/careers"
   },
   {
     id: "bmw-ai-004",
@@ -101,7 +105,8 @@ export const internships: Internship[] = [
     startDate: "Flexible",
     type: "Mandatory Internship",
     industry: "Automotive",
-    focus: "Connected Car AI"
+    focus: "Connected Car AI",
+    applicationUrl: "https://www.bmwgroup.jobs"
   },
   {
     id: "zalando-nlp-005",
@@ -123,7 +128,8 @@ export const internships: Internship[] = [
     startDate: "Flexible",
     type: "Internship",
     industry: "E-commerce & Fashion",
-    focus: "NLP & GenAI"
+    focus: "NLP & GenAI",
+    applicationUrl: "https://jobs.zalando.com"
   },
   {
     id: "n26-ai-006",
@@ -145,7 +151,8 @@ export const internships: Internship[] = [
     startDate: "ASAP",
     type: "Internship",
     industry: "Fintech",
-    focus: "Fraud Detection"
+    focus: "Fraud Detection",
+    applicationUrl: "https://n26.com/careers"
   },
   {
     id: "telekom-ai-007",
@@ -167,7 +174,8 @@ export const internships: Internship[] = [
     startDate: "Flexible",
     type: "Mandatory Internship",
     industry: "Telecommunications",
-    focus: "Conversational AI"
+    focus: "Conversational AI",
+    applicationUrl: "https://jobs.deutschetelekom.de"
   },
   {
     id: "allianz-ai-008",
@@ -189,7 +197,8 @@ export const internships: Internship[] = [
     startDate: "Flexible",
     type: "Internship",
     industry: "Insurance & Financial Services",
-    focus: "Document AI"
+    focus: "Document AI",
+    applicationUrl: "https://www.allianz.com/careers"
   },
   {
     id: "deepl-ai-009",
@@ -211,7 +220,8 @@ export const internships: Internship[] = [
     startDate: "Flexible",
     type: "Research Internship",
     industry: "AI & Language Technology",
-    focus: "Machine Translation"
+    focus: "Machine Translation",
+    applicationUrl: "https://www.deepl.com/careers"
   },
   {
     id: "biontech-ai-010",
@@ -233,7 +243,8 @@ export const internships: Internship[] = [
     startDate: "Flexible",
     type: "Research Internship",
     industry: "Biotechnology & Pharma",
-    focus: "Biomedical AI"
+    focus: "Biomedical AI",
+    applicationUrl: "https://www.biontech.de/careers"
   },
   {
     id: "celonis-ai-011",
@@ -255,7 +266,8 @@ export const internships: Internship[] = [
     startDate: "Flexible",
     type: "Internship",
     industry: "Enterprise Software",
-    focus: "Process Mining AI"
+    focus: "Process Mining AI",
+    applicationUrl: "https://www.celonis.com/careers"
   },
   {
     id: "deliveryhero-ai-012",
@@ -277,7 +289,8 @@ export const internships: Internship[] = [
     startDate: "ASAP",
     type: "Internship",
     industry: "Food Delivery & E-commerce",
-    focus: "Recommendation Systems"
+    focus: "Recommendation Systems",
+    applicationUrl: "https://www.deliveryhero.com/careers"
   },
   {
     id: "dfki-ai-013",
@@ -299,7 +312,8 @@ export const internships: Internship[] = [
     startDate: "Flexible",
     type: "Research Internship",
     industry: "Research Institute",
-    focus: "Foundation Models"
+    focus: "Foundation Models",
+    applicationUrl: "https://www.dfki.de/careers"
   },
   {
     id: "airbus-ai-014",
@@ -321,7 +335,8 @@ export const internships: Internship[] = [
     startDate: "Flexible",
     type: "Mandatory Internship",
     industry: "Aerospace & Defense",
-    focus: "Aerospace AI"
+    focus: "Aerospace AI",
+    applicationUrl: "https://www.airbus.com/careers"
   },
   {
     id: "personio-ai-015",
@@ -343,7 +358,8 @@ export const internships: Internship[] = [
     startDate: "Flexible",
     type: "Internship",
     industry: "HR Technology",
-    focus: "HR AI"
+    focus: "HR AI",
+    applicationUrl: "https://www.personio.com/careers"
   },
   {
     id: "mercedes-ai-016",
@@ -365,7 +381,8 @@ export const internships: Internship[] = [
     startDate: "Flexible",
     type: "Mandatory Internship",
     industry: "Automotive",
-    focus: "Autonomous Driving"
+    focus: "Autonomous Driving",
+    applicationUrl: "https://www.mercedes-benz.com/careers"
   },
   {
     id: "bayer-ai-017",
@@ -387,7 +404,8 @@ export const internships: Internship[] = [
     startDate: "Flexible",
     type: "Research Internship",
     industry: "Pharmaceuticals",
-    focus: "Drug Discovery AI"
+    focus: "Drug Discovery AI",
+    applicationUrl: "https://www.bayer.com/careers"
   },
   {
     id: "trivago-ai-018",
@@ -409,7 +427,8 @@ export const internships: Internship[] = [
     startDate: "ASAP",
     type: "Internship",
     industry: "Travel & E-commerce",
-    focus: "Search & Ranking"
+    focus: "Search & Ranking",
+    applicationUrl: "https://www.trivago.com/careers"
   },
   {
     id: "db-ai-019",
@@ -431,7 +450,8 @@ export const internships: Internship[] = [
     startDate: "Flexible",
     type: "Mandatory Internship",
     industry: "Transportation",
-    focus: "Mobility AI"
+    focus: "Mobility AI",
+    applicationUrl: "https://www.deutschebahn.com/careers"
   },
   {
     id: "fraunhofer-ai-020",
@@ -453,6 +473,7 @@ export const internships: Internship[] = [
     startDate: "Flexible",
     type: "Research Internship",
     industry: "Research Institute",
-    focus: "Applied AI Research"
+    focus: "Applied AI Research",
+    applicationUrl: "https://www.fraunhofer.de/careers"
   }
 ];
