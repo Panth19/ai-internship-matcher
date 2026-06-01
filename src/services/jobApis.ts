@@ -169,5 +169,10 @@ export async function fetchAllJobs(): Promise<Internship[]> {
     }
   }
 
-  return unique.sort((a, b) => (b.applicationUrl ? 1 : -1)); // Prioritize jobs with URLs
+  // Prioritize jobs with application URLs
+  return unique.sort((jobA, jobB) => {
+    const aHasUrl = jobA.applicationUrl ? 1 : 0;
+    const bHasUrl = jobB.applicationUrl ? 1 : 0;
+    return bHasUrl - aHasUrl;
+  });
 }
